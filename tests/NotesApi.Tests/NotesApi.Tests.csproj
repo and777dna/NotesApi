@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\NotesApi.Api\NotesApi.Api.csproj" />
+    <ProjectReference Include="..\..\src\NotesApi.Domain\NotesApi.Domain.csproj" />
   </ItemGroup>
 
 </Project>

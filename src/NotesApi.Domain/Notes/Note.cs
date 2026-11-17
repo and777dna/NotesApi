@@ -31,7 +31,7 @@ public class Note
     public void ChangeContent(string newTitle, string newBody)
     {
         if (IsPublished)
-            throw new DomainException("Опубликованную запись менять нельзя.");
+            throw new DomainException("published note cannot be modified.");
 
         ValidateTitle(newTitle);
         Title = newTitle;
@@ -41,7 +41,7 @@ public class Note
     public void Publish(DateTimeOffset now)
     {
         if (IsPublished)
-            throw new DomainException("Запись уже опубликована.");
+            throw new DomainException("note is publicated already.");
 
         PublishedAt = now;
     }
