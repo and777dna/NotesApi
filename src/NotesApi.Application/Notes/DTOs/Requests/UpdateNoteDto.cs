@@ -1,3 +1,3 @@
 namespace NotesApi.Api.DTOs.Requests;
 
-public record UpdateNoteDto(){};
+public record UpdateNoteDto(string Title, string Body);

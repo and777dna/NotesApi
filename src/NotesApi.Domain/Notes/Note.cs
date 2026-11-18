@@ -7,8 +7,8 @@ public class Note
     
     public Guid Id { get; private set; }
     public Guid AuthorId { get; private set; }
-    public string Title { get; private set; } = null!;
-    public string Body { get; private set; } = null!;
+    public string Title { get; private set; }
+    public string Body { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset? PublishedAt { get; private set; }
 
