@@ -1,8 +1,9 @@
 // Program.cs — точка входа и настройка.
-// Сейчас зарегистрирован только AppDbContext — он нужен для миграций (шаг 5). Остальное — шаг 7.
+// Сейчас подключены Serilog и AppDbContext (он нужен для миграций, шаг 5). Остальное — шаг 7.
 //
 // Этап 0 — что зарегистрировать и подключить:
 //   - AppDbContext с Npgsql (строка подключения из appsettings: ConnectionStrings:Default);
+//   - Serilog (настройки в appsettings: секция Serilog);
 //   - NoteService;
 //   - ProblemDetails, обработка исключений, коды ошибок;
 //   - OpenAPI (AddOpenApi / MapOpenApi);
@@ -13,8 +14,14 @@
 
 using Microsoft.EntityFrameworkCore;
 using NotesApi.Infrastructure.Persistence;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSerilog((services, logger) => logger
+    .ReadFrom.Configuration(builder.Configuration)
+    .ReadFrom.Services(services)
+    .Enrich.FromLogContext());
 
 var connectionString = builder.Configuration.GetConnectionString("Default")
     ?? throw new InvalidOperationException("Connection string 'Default' is missing.");
@@ -22,6 +29,8 @@ var connectionString = builder.Configuration.GetConnectionString("Default")
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
 
 var app = builder.Build();
+
+app.UseSerilogRequestLogging();
 
 app.Run();
 
