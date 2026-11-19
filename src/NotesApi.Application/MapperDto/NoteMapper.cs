@@ -7,7 +7,6 @@ namespace NotesApi.Application.MapperDto;
 
 public class NoteMapper : INoteMapper
 {
-    // Note → ResponseNoteDto
     public ResponseNoteDto ToDto(Note entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
@@ -22,7 +21,6 @@ public class NoteMapper : INoteMapper
             entity.IsPublished);
     }
 
-    // RequestNoteDto → Note (через доменную фабрику, валидация остаётся в домене)
     public Note ToEntity(RequestNoteDto dto, Guid authorId, DateTimeOffset now)
     {
         ArgumentNullException.ThrowIfNull(dto);
@@ -30,7 +28,6 @@ public class NoteMapper : INoteMapper
         return Note.Create(dto.Title, dto.Body, authorId, now);
     }
 
-    // UpdateNoteDto → изменения существующей Note
     public void ApplyUpdate(Note entity, UpdateNoteDto dto)
     {
         ArgumentNullException.ThrowIfNull(entity);
@@ -39,7 +36,6 @@ public class NoteMapper : INoteMapper
         entity.ChangeContent(dto.Title, dto.Body);
     }
 
-    // Страница сущностей → PagedResult<ResponseNoteDto>
     public PagedResult<ResponseNoteDto> ToPagedResult(
         IReadOnlyList<Note> notes, int page, int pageSize, int totalCount)
     {

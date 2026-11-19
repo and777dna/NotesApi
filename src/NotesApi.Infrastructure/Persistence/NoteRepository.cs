@@ -1,12 +1,3 @@
-// NoteRepository — слой Infrastructure. Хранит записи в PostgreSQL через AppDbContext.
-//
-// Делает:
-//   - добавляет, отдаёт по id, обновляет и удаляет запись;
-//   - отдаёт страницу опубликованных записей (новые сначала) и их количество.
-//   Каждое изменение сохраняет через SaveChangesAsync().
-//
-// Партнёры: AppDbContext, Note.
-
 using Microsoft.EntityFrameworkCore;
 using NotesApi.Application.Notes.Interfaces;
 using NotesApi.Domain.Notes;
@@ -17,7 +8,6 @@ public class NoteRepository(AppDbContext db) : INoteRepository
 {
     public async Task AddAsync(Note note, CancellationToken ct)
     {
-        // Add только помечает запись в памяти, в базу идёт SaveChangesAsync.
         db.Notes.Add(note);
         await db.SaveChangesAsync(ct);
     }
@@ -33,11 +23,9 @@ public class NoteRepository(AppDbContext db) : INoteRepository
         return true;
     }
 
-    // FindAsync сначала ищет среди уже загруженных записей и только потом идёт в базу.
     public async Task<Note?> GetByIdAsync(Guid id, CancellationToken ct) =>
         await db.Notes.FindAsync([id], ct);
 
-    // IsPublished в базе нет (считается из PublishedAt), поэтому фильтр по PublishedAt.
     public async Task<IReadOnlyList<Note>> GetPublishedAsync(int page, int pageSize, CancellationToken ct) =>
         await db.Notes
             .AsNoTracking()

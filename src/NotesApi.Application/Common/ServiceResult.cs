@@ -1,8 +1,3 @@
-// ServiceResult — слой Application. Результат действия сервиса.
-//
-// Знает: статус (успех / не найдено / конфликт / плохие данные) и текст ошибки.
-// Про HTTP-коды не знает — их выбирает эндпоинт по Status.
-
 using System.Diagnostics.CodeAnalysis;
 
 namespace NotesApi.Application.Common;
