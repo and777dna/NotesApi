@@ -1,0 +1,107 @@
+{
+  "info": {
+    "name": "NotesApi",
+    "description": "Stage 0 notes API. Run the requests in order (Collection Runner): 'Create note' saves the new id into the noteId variable.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5220" },
+    { "key": "noteId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Create note",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('201 Created', () => pm.response.to.have.status(201));",
+        "pm.test('Location header', () => pm.response.to.have.header('Location'));",
+        "pm.collectionVariables.set('noteId', pm.response.json().id);"
+      ] } }],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"title\": \"First note\",\n  \"body\": \"Hello from Postman\"\n}", "options": { "raw": { "language": "json" } } },
+        "url": "{{baseUrl}}/notes"
+      }
+    },
+    {
+      "name": "Create note - empty title (400)",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('400 Bad Request', () => pm.response.to.have.status(400));"
+      ] } }],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"title\": \"\",\n  \"body\": \"No title\"\n}", "options": { "raw": { "language": "json" } } },
+        "url": "{{baseUrl}}/notes"
+      }
+    },
+    {
+      "name": "Get note by id",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('200 OK', () => pm.response.to.have.status(200));",
+        "pm.test('Is a draft', () => pm.expect(pm.response.json().isPublished).to.eql(false));"
+      ] } }],
+      "request": { "method": "GET", "url": "{{baseUrl}}/notes/{{noteId}}" }
+    },
+    {
+      "name": "Change note",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('204 No Content', () => pm.response.to.have.status(204));"
+      ] } }],
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"title\": \"First note (changed)\",\n  \"body\": \"Changed text\"\n}", "options": { "raw": { "language": "json" } } },
+        "url": "{{baseUrl}}/notes/{{noteId}}"
+      }
+    },
+    {
+      "name": "Publish note",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('204 No Content', () => pm.response.to.have.status(204));"
+      ] } }],
+      "request": { "method": "POST", "url": "{{baseUrl}}/notes/{{noteId}}/publish" }
+    },
+    {
+      "name": "Publish again (409)",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('409 Conflict', () => pm.response.to.have.status(409));"
+      ] } }],
+      "request": { "method": "POST", "url": "{{baseUrl}}/notes/{{noteId}}/publish" }
+    },
+    {
+      "name": "Change published note (409)",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('409 Conflict', () => pm.response.to.have.status(409));"
+      ] } }],
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"title\": \"Too late\",\n  \"body\": \"Already published\"\n}", "options": { "raw": { "language": "json" } } },
+        "url": "{{baseUrl}}/notes/{{noteId}}"
+      }
+    },
+    {
+      "name": "List published notes",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('200 OK', () => pm.response.to.have.status(200));",
+        "pm.test('Contains the published note', () => pm.expect(pm.response.json().items.map(n => n.id)).to.include(pm.collectionVariables.get('noteId')));"
+      ] } }],
+      "request": { "method": "GET", "url": "{{baseUrl}}/notes?page=1&pageSize=10" }
+    },
+    {
+      "name": "Delete note",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('204 No Content', () => pm.response.to.have.status(204));"
+      ] } }],
+      "request": { "method": "DELETE", "url": "{{baseUrl}}/notes/{{noteId}}" }
+    },
+    {
+      "name": "Get deleted note (404)",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('404 Not Found', () => pm.response.to.have.status(404));"
+      ] } }],
+      "request": { "method": "GET", "url": "{{baseUrl}}/notes/{{noteId}}" }
+    }
+  ]
+}
