@@ -1,18 +1,3 @@
-// NoteEndpoints — слой Api. Контроллер (ControllerBase): принимает HTTP-запросы и отдаёт коды.
-//
-// Этап 0 (без защиты):
-//   POST   /notes              — создать черновик → 201 + Location
-//   GET    /notes              — список опубликованных → 200
-//   GET    /notes/{id}         — одна запись → 200 / 404
-//   PUT    /notes/{id}         — изменить → 204 / 404 / 409
-//   POST   /notes/{id}/publish — опубликовать → 204 / 404 / 409
-//   DELETE /notes/{id}         — удалить → 204 / 404
-//   Плохие данные → 400. Ответ сервиса: «не найдено» → 404, «конфликт» → 409.
-//
-// Позже: [Authorize] на всём контроллере, роль Writer — на изменяющих действиях.
-//
-// Партнёры: NoteService.
-
 using Microsoft.AspNetCore.Mvc;
 using NotesApi.Api.DTOs.Requests;
 using NotesApi.Api.DTOs.Responses;
@@ -87,7 +72,6 @@ public class NoteEndpoints(INoteService noteService) : ControllerBase
         return NoContent();
     }
 
-    // Единственное место, где результат сервиса превращается в HTTP-код (ProblemDetails).
     private ObjectResult ToProblem(ResultStatus status, string? error) => status switch
     {
         ResultStatus.NotFound => Problem(

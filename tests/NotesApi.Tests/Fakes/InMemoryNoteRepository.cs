@@ -4,15 +4,12 @@ using NotesApi.Domain.Notes;
 
 namespace NotesApi.Tests.Fakes;
 
-// Репозиторий в памяти вместо PostgreSQL — для тестов без базы.
-// Ведёт себя как NoteRepository: опубликованные — новые сначала, удаление возвращает false, если записи нет.
 public class InMemoryNoteRepository : INoteRepository
 {
     private readonly ConcurrentDictionary<Guid, Note> _notes = new();
 
     public int Count => _notes.Count;
 
-    // Сколько раз сервис сохранял изменения существующей записи.
     public int UpdateCount { get; private set; }
 
     public Task AddAsync(Note note, CancellationToken ct)

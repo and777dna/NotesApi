@@ -8,7 +8,6 @@ using NotesApi.Tests.Fakes;
 
 namespace NotesApi.Tests;
 
-// Настоящее API в памяти теста. PostgreSQL заменён репозиторием в памяти, поэтому Docker не нужен.
 public class NotesApiFactory : WebApplicationFactory<Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)

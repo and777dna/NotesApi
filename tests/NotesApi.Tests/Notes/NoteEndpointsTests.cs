@@ -7,7 +7,6 @@ namespace NotesApi.Tests.Notes;
 
 public class NoteEndpointsTests(NotesApiFactory factory) : IClassFixture<NotesApiFactory>
 {
-    // README, шаг 8: «POST → GET вернул то же».
     [Fact]
     public async Task Post_ThenGet_ReturnsTheSameNote()
     {

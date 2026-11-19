@@ -1,16 +1,3 @@
-// NoteService — слой Application. Действия с записями.
-//
-// Обязанности на этапе 0 (без защиты):
-//   - создать черновик;
-//   - отдать одну запись по id («не найдено», если нет);
-//   - отдать список опубликованных записей постранично;
-//   - изменить, опубликовать, удалить запись.
-//   Возвращает результат «успех / не найдено / конфликт / плохие данные» — про HTTP-коды не знает.
-//
-// Позже (этап 4): проверка владельца через ICurrentUser — чужая запись → «не найдено».
-//
-// Партнёры: Note, INoteRepository (→ AppDbContext), INoteMapper, TimeProvider; позже ICurrentUser.
-
 using NotesApi.Api.DTOs.Requests;
 using NotesApi.Api.DTOs.Responses;
 using NotesApi.Application.Common;
@@ -23,8 +10,6 @@ namespace NotesApi.Application.Notes;
 
 public class NoteService(INoteRepository repository, INoteMapper mapper, TimeProvider timeProvider) : INoteService
 {
-    // Этап 0: пользователей ещё нет, автор неизвестен.
-    // Этап 4: здесь будет ICurrentUser.UserId.
     private static readonly Guid UnknownAuthorId = Guid.Empty;
 
     public async Task<ServiceResult<ResponseNoteDto>> AddNoteAsync(RequestNoteDto requestNoteDto, CancellationToken ct)
@@ -76,8 +61,6 @@ public class NoteService(INoteRepository repository, INoteMapper mapper, TimePro
         }
         catch (DomainException ex)
         {
-            // Правила проверяет Note. Опубликованную запись менять нельзя → конфликт,
-            // иначе Note отклонила данные (заголовок) → плохие данные.
             return note.IsPublished
                 ? ServiceResult.Conflict(ex.Message)
                 : ServiceResult.Invalid(ex.Message);
@@ -99,7 +82,6 @@ public class NoteService(INoteRepository repository, INoteMapper mapper, TimePro
         }
         catch (DomainException ex)
         {
-            // Публикуется только черновик, повторная публикация → конфликт.
             return ServiceResult.Conflict(ex.Message);
         }
 
