@@ -1,14 +1,56 @@
-// Note — слой Domain. Ничего не знает про базу, HTTP и JWT.
-//
-// Знает:
-//   Id (Guid), AuthorId (Guid — на этапе 0 пока заглушка, заполнится с этапа 2),
-//   Title (обязателен, до 200 символов), Body,
-//   CreatedAt, PublishedAt (null, пока черновик) — DateTimeOffset в UTC,
-//   IsPublished — вычисляется из PublishedAt, отдельно не хранится.
-//
-// Делает:
-//   - создаётся черновиком (проверяет заголовок);
-//   - меняет заголовок и текст — только черновик, иначе «конфликт»;
-//   - публикуется — только из черновика, иначе «конфликт»; ставит PublishedAt.
-//
-// Партнёры: нет.
+using NotesApi.Domain.Exceptions;
+
+namespace NotesApi.Domain.Notes;
+public class Note
+{
+    public const int TitleMaxLength = 200;
+    
+    public Guid Id { get; private set; }
+    public Guid AuthorId { get; private set; }
+    public string Title { get; private set; }
+    public string Body { get; private set; }
+    public DateTimeOffset CreatedAt { get; private set; }
+    public DateTimeOffset? PublishedAt { get; private set; }
+
+    public bool IsPublished => PublishedAt is not null;
+    private Note(){}
+    public static Note Create(string title, string body, Guid authorId, DateTimeOffset now)
+    {
+        ValidateTitle(title);
+
+        return new Note
+        {
+            Id = Guid.NewGuid(),
+            AuthorId = authorId,
+            Title = title,
+            Body = body ?? string.Empty,
+            CreatedAt = now
+        };
+    }
+
+    public void ChangeContent(string newTitle, string newBody)
+    {
+        if (IsPublished)
+            throw new DomainException("published note cannot be modified.");
+
+        ValidateTitle(newTitle);
+        Title = newTitle;
+        Body = newBody ?? string.Empty;
+    }
+    
+    public void Publish(DateTimeOffset now)
+    {
+        if (IsPublished)
+            throw new DomainException("note is publicated already.");
+
+        PublishedAt = now;
+    }
+    
+    private static void ValidateTitle(string title)
+    {
+        if (string.IsNullOrWhiteSpace(title))
+            throw new DomainException("Title is required.");
+        if (title.Length > TitleMaxLength)
+            throw new DomainException($"Title is longer than {TitleMaxLength}.");
+    }
+}

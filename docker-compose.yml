@@ -1,8 +1,14 @@
-# Этап 0: только PostgreSQL. API запускаешь сам через dotnet run.
-#
-# Что описать:
-#   - сервис postgres (образ postgres:17), порт 5432;
-#   - переменные: POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB;
-#   - volume, чтобы данные не пропадали после перезапуска.
-#
-# Позже сюда добавятся Mailpit (письма) и, по желанию, Keycloak.
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: notes
+      POSTGRES_PASSWORD: notes_dev_password
+      POSTGRES_DB: notes
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:
